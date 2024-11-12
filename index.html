@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Capital Gains Tax in New Zealand</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #60a5fa;
+            --accent-tertiary: #93c5fd;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 1rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            scroll-behavior: smooth;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .header p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .intro-card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            text-align: justify;
+            margin-bottom: 1.5rem;
+        }
+
+        .intro-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .calculator {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+        }
+
+        .slider-container {
+            margin-bottom: 2rem;
+        }
+
+        .slider-container label {
+            display: block;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .slider-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            background: var(--accent-tertiary);
+            border-radius: var(--radius-sm);
+            outline: none;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.15s ease-in-out;
+        }
+
+        .slider-value {
+            min-width: 120px;
+            padding: 0.5rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--accent-tertiary);
+            border-radius: var(--radius-sm);
+            text-align: right;
+            font-family: monospace;
+        }
+
+        .tax-rate-selector {
+            margin-bottom: 2rem;
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .radio-option {
+            position: relative;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 0.5rem 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent-tertiary);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .radio-option input[type="radio"]:checked+label {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .radio-option label:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .custom-rate {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .custom-rate input[type="number"] {
+            width: 100px;
+            padding: 0.5rem;
+            border: 1px solid var(--accent-tertiary);
+            border-radius: var(--radius-sm);
+        }
+
+        .timeline,
+        .scenario-timeline {
+            position: relative;
+            height: 80px;
+            margin: 1.5rem 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-tertiary);
+        }
+
+        .timeline-event {
+            position: absolute;
+            transform: translateX(-50%);
+            text-align: center;
+            width: 80px;
+        }
+
+        .timeline-event-dot {
+            width: 2px;
+            height: 16px;
+            background: var(--accent-primary);
+            margin: 4px auto;
+        }
+
+        .timeline-event-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .timeline-event-value {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .timeline {
+            margin: 2rem 0;
+        }
+
+        .scenario-timeline {
+            margin: 1.5rem 0;
+        }
+
+        .scenario-timeline .timeline-event-value {
+            font-weight: 600;
+        }
+
+        .tax-summary {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .tax-summary h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .tax-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .tax-row.total {
+            border-top: 2px solid var(--accent-tertiary);
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+
+        .gain-positive {
+            color: var(--success);
+        }
+
+        .gain-negative {
+            color: var(--error);
+        }
+
+        .tax-positive {
+            color: var(--error);
+        }
+
+        .tax-negative {
+            color: var(--success);
+        }
+
+        .scenario-card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--accent-tertiary);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .scenario-card h3 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 3rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .slider-group {
+                flex-direction: column;
+            }
+
+            .slider-value {
+                width: 100%;
+                text-align: center;
+            }
+
+            .radio-group {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <h1>Understanding Capital Gains Tax in New Zealand</h1>
+        <p>A simple guide to how CGT could work for you</p>
+    </header>
+
+    <main class="container">
+        <div class="intro-card">
+            <h2>What is Capital Gains Tax?</h2>
+            <p>Capital Gains Tax (CGT) is a tax on the profit made from selling certain assets, such as property,
+                shares, or businesses. To help New Zealand transition from having no comprehensive CGT to implementing
+                one, the concept of "V-Day" (Valuation Day) is crucial.</p>
+            <p>V-Day would mark the starting point for measuring capital gains. In the examples below, we presume V-Day
+                is 1 April 2026—the hypothetical date for a New Zealand CGT regime to begin. Any increase in an
+                asset's value before V-Day would not be taxed, while gains after V-Day would be subject to CGT. This
+                approach ensures fairness by only taxing future gains while protecting historical value growth.</p>
+        </div>
+
+        <div id="calculator" class="card">
+            <h2>CGT Calculator</h2>
+            <div class="calculator">
+                <div class="slider-container">
+                    <label>Purchase Price (Purchase Year: <span id="purchaseYear">2020</span>)</label>
+                    <div class="slider-group">
+                        <input type="range" id="purchasePrice" min="0" max="2000000" step="10000" value="500000">
+                        <div class="slider-value" id="purchasePriceValue">$500,000</div>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label>V-Day Value (1 April 2026)</label>
+                    <div class="slider-group">
+                        <input type="range" id="vdayValue" min="100000" max="2000000" step="10000" value="600000">
+                        <div class="slider-value" id="vdayValueValue">$600,000</div>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label>Sale Price (Sale Year: <span id="saleYear">2028</span>)</label>
+                    <div class="slider-group">
+                        <input type="range" id="salePrice" min="100000" max="2000000" step="10000" value="700000">
+                        <div class="slider-value" id="salePriceValue">$700,000</div>
+                    </div>
+                </div>
+
+                <div class="tax-rate-selector">
+                    <label>Select Tax Rate</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="rate10-5" name="taxRate" value="10.5">
+                            <label for="rate10-5">10.5% (Individual)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="rate17-5" name="taxRate" value="17.5">
+                            <label for="rate17-5">17.5% (Individual)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="rate28" name="taxRate" value="28">
+                            <label for="rate28">28% (Company)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="rate30" name="taxRate" value="30">
+                            <label for="rate30">30% (Individual)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="rate33" name="taxRate" value="33">
+                            <label for="rate33">33% (Individual)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="rate39" name="taxRate" value="39" checked>
+                            <label for="rate39">39% (Individual)</label>
+                        </div>
+                    </div>
+                    <div class="custom-rate">
+                        <input type="radio" id="rateCustom" name="taxRate" value="custom">
+                        <input type="number" id="customRateValue" min="0" max="100" value="30" disabled>
+                        <label for="rateCustom">% (Custom)</label>
+                    </div>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-line"></div>
+                    <div class="timeline-event" style="left: 0%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">Purchase</div>
+                        <div class="timeline-event-value" id="timelinePurchaseValue">$500,000</div>
+                    </div>
+                    <div class="timeline-event" style="left: 50%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">V-Day</div>
+                        <div class="timeline-event-value" id="timelineVDayValue">$600,000</div>
+                    </div>
+                    <div class="timeline-event" style="left: 100%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">Sale</div>
+                        <div class="timeline-event-value" id="timelineSaleValue">$700,000</div>
+                    </div>
+                </div>
+
+                <div class="tax-summary">
+                    <h3>Tax Calculation</h3>
+                    <div class="tax-row">
+                        <span>Pre V-Day Gain/Loss:</span>
+                        <span id="preVDayGain">$100,000</span>
+                    </div>
+                    <div class="tax-row">
+                        <span>Post V-Day Gain/Loss:</span>
+                        <span id="postVDayGain">$100,000</span>
+                    </div>
+                    <div class="tax-row">
+                        <span>Tax Rate:</span>
+                        <span id="effectiveTaxRate">39%</span>
+                    </div>
+                    <div class="tax-row total">
+                        <span>Tax Payable/(Refundable):</span>
+                        <span id="taxPayable">$39,000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Common Scenarios</h2>
+            <div class="scenario-card" onclick="loadScenario('growth')">
+                <h3>Steady Growth</h3>
+                <div class="scenario-timeline">
+                    <div class="timeline-line"></div>
+                    <div class="timeline-event" style="left: 0%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">2020</div>
+                        <div class="timeline-event-value">$500k</div>
+                    </div>
+                    <div class="timeline-event" style="left: 50%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">2026</div>
+                        <div class="timeline-event-value">$700k</div>
+                    </div>
+                    <div class="timeline-event" style="left: 100%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">2028</div>
+                        <div class="timeline-event-value">$900k</div>
+                    </div>
+                </div>
+                <p>Property purchased for $500,000 in 2020, valued at $700,000 on V-Day, sold for $900,000 in 2028.
+                    Results in a taxable gain of $200,000 with tax payable of $78,000 at 39% tax rate.</p>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('loss')">
+                <h3>Capital Loss</h3>
+                <div class="scenario-timeline">
+                    <div class="timeline-line"></div>
+                    <div class="timeline-event" style="left: 0%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">2020</div>
+                        <div class="timeline-event-value">$600k</div>
+                    </div>
+                    <div class="timeline-event" style="left: 50%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">2026</div>
+                        <div class="timeline-event-value">$800k</div>
+                    </div>
+                    <div class="timeline-event" style="left: 100%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">2028</div>
+                        <div class="timeline-event-value">$750k</div>
+                    </div>
+                </div>
+                <p>Property purchased for $600,000 in 2020, valued at $800,000 on V-Day, sold for $750,000 in 2028.
+                    Results in a capital loss of $50,000 which can be offset against other capital gains or potentially
+                    against income.</p>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('neutral')">
+                <h3>No Taxable Gain</h3>
+                <div class="scenario-timeline">
+                    <div class="timeline-line"></div>
+                    <div class="timeline-event" style="left: 0%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">2020</div>
+                        <div class="timeline-event-value">$400k</div>
+                    </div>
+                    <div class="timeline-event" style="left: 50%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">2026</div>
+                        <div class="timeline-event-value">$600k</div>
+                    </div>
+                    <div class="timeline-event" style="left: 100%">
+                        <div class="timeline-event-dot"></div>
+                        <div class="timeline-event-label">2028</div>
+                        <div class="timeline-event-value">$600k</div>
+                    </div>
+                </div>
+                <p>Property purchased for $400,000 in 2020, valued at $600,000 on V-Day, sold for $600,000 in 2028. No
+                    tax payable as there is no post V-Day capital gain.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.querySelectorAll('.scenario-timeline').forEach(timeline => {
+            updateScenarioTimelinePositions(timeline, 2020, 2026, 2028);
+        });
+
+        function formatCurrency(value) {
+            return '$' + value.toLocaleString();
+        }
+
+        function calculateTimelinePosition(year, startYear, endYear) {
+            return ((year - startYear) / (endYear - startYear) * 100) + '%';
+        }
+
+        function updateScenarioTimelinePositions(scenarioDiv, startYear, midYear, endYear) {
+            const events = scenarioDiv.querySelectorAll('.timeline-event');
+            events[0].style.left = '0%';
+            events[1].style.left = calculateTimelinePosition(midYear, startYear, endYear);
+            events[2].style.left = '100%';
+        }
+
+        function updateCalculations() {
+            const purchasePrice = parseFloat(document.getElementById('purchasePrice').value);
+            const vdayValue = parseFloat(document.getElementById('vdayValue').value);
+            const salePrice = parseFloat(document.getElementById('salePrice').value);
+
+            const selectedRate = document.querySelector('input[name="taxRate"]:checked');
+            let taxRate;
+            if (selectedRate.value === 'custom') {
+                taxRate = parseFloat(document.getElementById('customRateValue').value) / 100;
+            } else {
+                taxRate = parseFloat(selectedRate.value) / 100;
+            }
+
+            const preVDayGain = vdayValue - purchasePrice;
+            const postVDayGain = salePrice - vdayValue;
+            const taxPayable = postVDayGain * taxRate;
+
+            document.getElementById('purchasePriceValue').textContent = formatCurrency(purchasePrice);
+            document.getElementById('vdayValueValue').textContent = formatCurrency(vdayValue);
+            document.getElementById('salePriceValue').textContent = formatCurrency(salePrice);
+
+            document.getElementById('timelinePurchaseValue').textContent = formatCurrency(purchasePrice);
+            document.getElementById('timelineVDayValue').textContent = formatCurrency(vdayValue);
+            document.getElementById('timelineSaleValue').textContent = formatCurrency(salePrice);
+
+            document.getElementById('preVDayGain').textContent = formatCurrency(preVDayGain);
+            document.getElementById('postVDayGain').textContent = formatCurrency(postVDayGain);
+            document.getElementById('effectiveTaxRate').textContent = (taxRate * 100) + '%';
+            document.getElementById('taxPayable').textContent = formatCurrency(taxPayable);
+
+            document.getElementById('postVDayGain').className = postVDayGain >= 0 ? 'gain-positive' : 'gain-negative';
+            document.getElementById('taxPayable').className = postVDayGain >= 0 ? 'tax-positive' : 'tax-negative';
+
+            const purchaseYear = parseInt(document.getElementById('purchaseYear').textContent);
+            const saleYear = parseInt(document.getElementById('saleYear').textContent);
+            const vdayYear = 2026;
+
+            const totalYears = saleYear - purchaseYear;
+            const vdayPosition = ((vdayYear - purchaseYear) / totalYears) * 100;
+
+            document.querySelectorAll('.timeline-event')[1].style.left = vdayPosition + '%';
+        }
+
+        function loadScenario(type) {
+            switch (type) {
+                case 'growth':
+                    document.getElementById('purchasePrice').value = 500000;
+                    document.getElementById('vdayValue').value = 700000;
+                    document.getElementById('salePrice').value = 900000;
+                    document.getElementById('purchaseYear').textContent = '2020';
+                    document.getElementById('saleYear').textContent = '2028';
+                    break;
+                case 'loss':
+                    document.getElementById('purchasePrice').value = 600000;
+                    document.getElementById('vdayValue').value = 800000;
+                    document.getElementById('salePrice').value = 750000;
+                    document.getElementById('purchaseYear').textContent = '2020';
+                    document.getElementById('saleYear').textContent = '2028';
+                    break;
+                case 'neutral':
+                    document.getElementById('purchasePrice').value = 400000;
+                    document.getElementById('vdayValue').value = 600000;
+                    document.getElementById('salePrice').value = 600000;
+                    document.getElementById('purchaseYear').textContent = '2020';
+                    document.getElementById('saleYear').textContent = '2028';
+                    break;
+            }
+            document.querySelectorAll('.scenario-timeline').forEach(timeline => {
+                updateScenarioTimelinePositions(timeline, 2020, 2026, 2028);
+            });
+            updateCalculations();
+
+            const calculator = document.getElementById('calculator');
+            const rect = calculator.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const targetScroll = scrollTop + rect.top + (rect.height / 2) - (window.innerHeight / 2);
+            window.scrollTo({
+                top: targetScroll,
+                behavior: 'smooth'
+            });
+        }
+
+        document.getElementById('rateCustom').addEventListener('change', function () {
+            document.getElementById('customRateValue').disabled = !this.checked;
+        });
+
+        document.getElementById('purchasePrice').addEventListener('input', updateCalculations);
+        document.getElementById('vdayValue').addEventListener('input', updateCalculations);
+        document.getElementById('salePrice').addEventListener('input', updateCalculations);
+        document.getElementById('customRateValue').addEventListener('input', updateCalculations);
+        document.querySelectorAll('input[name="taxRate"]').forEach(radio => {
+            radio.addEventListener('change', updateCalculations);
+        });
+
+        updateCalculations();
+    </script>
+</body>
+
+</html>
