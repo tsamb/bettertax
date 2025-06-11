@@ -4,652 +4,643 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Understanding Capital Gains Tax in New Zealand</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <title>Understanding Capital Gains Tax Options for New Zealand</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/recharts@2.5.0/dist/Recharts.js"></script>
     <style>
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --accent-primary: #3b82f6;
-            --accent-secondary: #60a5fa;
-            --accent-tertiary: #93c5fd;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 1rem;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: var(--text-primary);
-            background-color: var(--bg-secondary);
-            scroll-behavior: smooth;
+            font-family: 'Inter', sans-serif;
         }
 
-        .header {
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            color: white;
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .header p {
-            font-size: 1.25rem;
-            opacity: 0.9;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        .intro-card {
-            background: var(--bg-primary);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid var(--accent-primary);
-            text-align: justify;
-            margin-bottom: 1.5rem;
-        }
-
-        .intro-card p:last-child {
-            margin-bottom: 0;
-        }
-
-        .card {
-            background: var(--bg-primary);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .calculator {
-            background: var(--bg-secondary);
-            padding: 2rem;
-            border-radius: var(--radius-lg);
-        }
-
-        .slider-container {
-            margin-bottom: 2rem;
-        }
-
-        .slider-container label {
-            display: block;
-            color: var(--text-secondary);
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .slider-group {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .slider-group input[type="range"] {
-            flex: 1;
-            height: 6px;
-            -webkit-appearance: none;
-            background: var(--accent-tertiary);
-            border-radius: var(--radius-sm);
-            outline: none;
-        }
-
-        .slider-group input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            background: var(--accent-primary);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background 0.15s ease-in-out;
-        }
-
-        .slider-value {
-            min-width: 120px;
-            padding: 0.5rem;
-            background: var(--bg-primary);
-            border: 1px solid var(--accent-tertiary);
-            border-radius: var(--radius-sm);
-            text-align: right;
-            font-family: monospace;
-        }
-
-        .tax-rate-selector {
-            margin-bottom: 2rem;
-        }
-
-        .radio-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .radio-option {
+        .tooltip {
             position: relative;
+            cursor: help;
         }
 
-        .radio-option input[type="radio"] {
+        .tooltip:hover .tooltip-content {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .tooltip-content {
             position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .radio-option label {
-            display: block;
-            padding: 0.5rem 0.5rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--accent-tertiary);
-            border-radius: var(--radius-sm);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
-        }
-
-        .radio-option input[type="radio"]:checked+label {
-            background: var(--accent-primary);
-            color: white;
-            border-color: var(--accent-primary);
-        }
-
-        .radio-option label:hover {
-            border-color: var(--accent-primary);
-        }
-
-        .custom-rate {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .custom-rate input[type="number"] {
-            width: 100px;
-            padding: 0.5rem;
-            border: 1px solid var(--accent-tertiary);
-            border-radius: var(--radius-sm);
-        }
-
-        .timeline,
-        .scenario-timeline {
-            position: relative;
-            height: 80px;
-            margin: 1.5rem 0;
-        }
-
-        .timeline-line {
-            position: absolute;
-            top: 12px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--accent-tertiary);
-        }
-
-        .timeline-event {
-            position: absolute;
+            bottom: 100%;
+            left: 50%;
             transform: translateX(-50%);
-            text-align: center;
-            width: 80px;
-        }
-
-        .timeline-event-dot {
-            width: 2px;
-            height: 16px;
-            background: var(--accent-primary);
-            margin: 4px auto;
-        }
-
-        .timeline-event-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        .timeline-event-value {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .timeline {
-            margin: 2rem 0;
-        }
-
-        .scenario-timeline {
-            margin: 1.5rem 0;
-        }
-
-        .scenario-timeline .timeline-event-value {
-            font-weight: 600;
-        }
-
-        .tax-summary {
-            background: var(--bg-secondary);
-            border-radius: var(--radius-md);
-            padding: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .tax-summary h3 {
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-        }
-
-        .tax-row {
-            display: flex;
-            justify-content: space-between;
+            background: #1e293b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            z-index: 50;
             margin-bottom: 0.5rem;
+            max-width: 250px;
+            white-space: normal;
         }
 
-        .tax-row.total {
-            border-top: 2px solid var(--accent-tertiary);
-            padding-top: 0.5rem;
-            margin-top: 0.5rem;
-            font-weight: bold;
+        .tooltip-content::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1e293b;
         }
 
-        .gain-positive {
-            color: var(--success);
+        .card-hover {
+            transition: all 0.3s ease;
         }
 
-        .gain-negative {
-            color: var(--error);
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.2);
         }
 
-        .tax-positive {
-            color: var(--error);
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
         }
 
-        .tax-negative {
-            color: var(--success);
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
-        .scenario-card {
-            background: var(--bg-primary);
-            border-radius: var(--radius-md);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--accent-tertiary);
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #059669;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            transition: background 0.3s;
         }
 
-        .scenario-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #059669;
+            cursor: pointer;
+            transition: background 0.3s;
         }
 
-        .scenario-card h3 {
-            color: var(--accent-primary);
-            margin-bottom: 0.5rem;
+        .slider:hover::-webkit-slider-thumb {
+            background: #047857;
         }
 
-        @media (max-width: 768px) {
-            .header {
-                padding: 3rem 1rem;
-            }
+        .slider:hover::-moz-range-thumb {
+            background: #047857;
+        }
 
-            .header h1 {
-                font-size: 2rem;
-            }
+        .difficulty-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #10b981 0%, #fbbf24 50%, #ef4444 100%);
+            position: relative;
+        }
 
-            .card {
-                padding: 1.5rem;
-            }
-
-            .slider-group {
-                flex-direction: column;
-            }
-
-            .slider-value {
-                width: 100%;
-                text-align: center;
-            }
-
-            .radio-group {
-                grid-template-columns: 1fr 1fr;
-            }
+        .difficulty-indicator {
+            position: absolute;
+            top: -6px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #1f2937;
+            transform: translateX(-50%);
         }
     </style>
 </head>
 
-<body>
-    <header class="header">
-        <h1>Understanding Capital Gains Tax in New Zealand</h1>
-        <p>A simple guide to how CGT could work for you</p>
-    </header>
+<body class="bg-gray-50">
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } = Recharts;
 
-    <main class="container">
-        <div class="intro-card">
-            <h2>What is Capital Gains Tax?</h2>
-            <p>Capital Gains Tax (CGT) is a tax on the profit made from selling certain assets, such as property,
-                shares, or businesses. To help New Zealand transition from having no comprehensive CGT to implementing
-                one, the concept of "V-Day" (Valuation Day) is crucial.</p>
-            <p>V-Day would mark the starting point for measuring capital gains. In the examples below, we presume V-Day
-                is 1 April 2026—the hypothetical date for a New Zealand CGT regime to begin. Any increase in an
-                asset's value before V-Day would not be taxed, while gains after V-Day would be subject to CGT. This
-                approach ensures fairness by only taxing future gains while protecting historical value growth.</p>
-        </div>
+        // Tesla-like historical returns (simplified version of TSLA 2013-2023)
+        const TESLA_RETURNS = [50, -10, 30, -20, 45, 15, 35, 80, 25, -65, 40];
 
-        <div id="calculator" class="card">
-            <h2>CGT Calculator</h2>
-            <div class="calculator">
-                <div class="slider-container">
-                    <label>Purchase Price (Purchase Year: <span id="purchaseYear">2020</span>)</label>
-                    <div class="slider-group">
-                        <input type="range" id="purchasePrice" min="0" max="2000000" step="10000" value="500000">
-                        <div class="slider-value" id="purchasePriceValue">$500,000</div>
-                    </div>
+        const Tooltip = ({ text, children }) => (
+            <span className="tooltip inline-block">
+                {children}
+                <span className="tooltip-content">{text}</span>
+            </span>
+        );
+
+        const DifficultyBar = ({ level }) => (
+            <div className="mt-2">
+                <div className="difficulty-bar">
+                    <div className="difficulty-indicator" style={{ left: `${level}%` }}></div>
                 </div>
-
-                <div class="slider-container">
-                    <label>V-Day Value (1 April 2026)</label>
-                    <div class="slider-group">
-                        <input type="range" id="vdayValue" min="100000" max="2000000" step="10000" value="600000">
-                        <div class="slider-value" id="vdayValueValue">$600,000</div>
-                    </div>
-                </div>
-
-                <div class="slider-container">
-                    <label>Sale Price (Sale Year: <span id="saleYear">2028</span>)</label>
-                    <div class="slider-group">
-                        <input type="range" id="salePrice" min="100000" max="2000000" step="10000" value="700000">
-                        <div class="slider-value" id="salePriceValue">$700,000</div>
-                    </div>
-                </div>
-
-                <div class="tax-rate-selector">
-                    <label>Select Tax Rate</label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="rate10-5" name="taxRate" value="10.5">
-                            <label for="rate10-5">10.5% (Individual)</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="rate17-5" name="taxRate" value="17.5">
-                            <label for="rate17-5">17.5% (Individual)</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="rate28" name="taxRate" value="28">
-                            <label for="rate28">28% (Company)</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="rate30" name="taxRate" value="30">
-                            <label for="rate30">30% (Individual)</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="rate33" name="taxRate" value="33">
-                            <label for="rate33">33% (Individual)</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="rate39" name="taxRate" value="39" checked>
-                            <label for="rate39">39% (Individual)</label>
-                        </div>
-                    </div>
-                    <div class="custom-rate">
-                        <input type="radio" id="rateCustom" name="taxRate" value="custom">
-                        <input type="number" id="customRateValue" min="0" max="100" value="30" disabled>
-                        <label for="rateCustom">% (Custom)</label>
-                    </div>
-                </div>
-
-                <div class="timeline">
-                    <div class="timeline-line"></div>
-                    <div class="timeline-event" style="left: 0%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">Purchase</div>
-                        <div class="timeline-event-value" id="timelinePurchaseValue">$500,000</div>
-                    </div>
-                    <div class="timeline-event" style="left: 50%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">V-Day</div>
-                        <div class="timeline-event-value" id="timelineVDayValue">$600,000</div>
-                    </div>
-                    <div class="timeline-event" style="left: 100%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">Sale</div>
-                        <div class="timeline-event-value" id="timelineSaleValue">$700,000</div>
-                    </div>
-                </div>
-
-                <div class="tax-summary">
-                    <h3>Tax Calculation</h3>
-                    <div class="tax-row">
-                        <span>Pre V-Day Gain/Loss:</span>
-                        <span id="preVDayGain">$100,000</span>
-                    </div>
-                    <div class="tax-row">
-                        <span>Post V-Day Gain/Loss:</span>
-                        <span id="postVDayGain">$100,000</span>
-                    </div>
-                    <div class="tax-row">
-                        <span>Tax Rate:</span>
-                        <span id="effectiveTaxRate">39%</span>
-                    </div>
-                    <div class="tax-row total">
-                        <span>Tax Payable/(Refundable):</span>
-                        <span id="taxPayable">$39,000</span>
-                    </div>
+                <div className="flex justify-between text-xs mt-1">
+                    <span className="text-green-600">Easy</span>
+                    <span className="text-yellow-600">Moderate</span>
+                    <span className="text-red-600">Hard</span>
                 </div>
             </div>
-        </div>
+        );
 
-        <div class="card">
-            <h2>Common Scenarios</h2>
-            <div class="scenario-card" onclick="loadScenario('growth')">
-                <h3>Steady Growth</h3>
-                <div class="scenario-timeline">
-                    <div class="timeline-line"></div>
-                    <div class="timeline-event" style="left: 0%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">2020</div>
-                        <div class="timeline-event-value">$500k</div>
-                    </div>
-                    <div class="timeline-event" style="left: 50%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">2026</div>
-                        <div class="timeline-event-value">$700k</div>
-                    </div>
-                    <div class="timeline-event" style="left: 100%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">2028</div>
-                        <div class="timeline-event-value">$900k</div>
-                    </div>
+        const App = () => {
+            const [activeTab, setActiveTab] = useState(0);
+            const [initialValue, setInitialValue] = useState(100000);
+            const [riskFreeRate, setRiskFreeRate] = useState(3);
+            const [holdingPeriod, setHoldingPeriod] = useState(10);
+            const [growthProfile, setGrowthProfile] = useState('steady');
+            const [steadyGrowth, setSteadyGrowth] = useState(7);
+            const [customReturns, setCustomReturns] = useState(Array(10).fill(7));
+            const [taxRate] = useState(33); // NZ top marginal rate
+
+            // Get the actual returns based on selected profile
+            const getReturns = () => {
+                if (growthProfile === 'steady') {
+                    return Array(holdingPeriod).fill(steadyGrowth);
+                } else if (growthProfile === 'tesla') {
+                    return TESLA_RETURNS.slice(0, holdingPeriod);
+                } else {
+                    return customReturns.slice(0, holdingPeriod);
+                }
+            };
+
+            // Calculate asset values over time
+            const calculateAssetPath = () => {
+                const returns = getReturns();
+                const path = [{ year: 0, value: initialValue }];
+                let currentValue = initialValue;
+
+                for (let i = 0; i < holdingPeriod; i++) {
+                    currentValue = currentValue * (1 + returns[i] / 100);
+                    path.push({ year: i + 1, value: currentValue });
+                }
+
+                return path;
+            };
+
+            // Tax regime calculations
+            const calculateStatusQuo = () => {
+                const finalValue = calculateAssetPath()[holdingPeriod].value;
+                return {
+                    totalTax: 0,
+                    afterTaxWealth: finalValue,
+                    effectiveRate: 0
+                };
+            };
+
+            const calculateRealisationCGT = () => {
+                const path = calculateAssetPath();
+                const finalValue = path[holdingPeriod].value;
+                const gain = finalValue - initialValue;
+                const tax = gain > 0 ? gain * (taxRate / 100) : 0;
+
+                return {
+                    totalTax: tax,
+                    afterTaxWealth: finalValue - tax,
+                    effectiveRate: gain > 0 ? (tax / gain) * 100 : 0
+                };
+            };
+
+            const calculateAccrual = () => {
+                const returns = getReturns();
+                let currentValue = initialValue;
+                let totalTax = 0;
+                const yearlyResults = [];
+
+                for (let i = 0; i < holdingPeriod; i++) {
+                    const startValue = currentValue;
+                    const endValue = startValue * (1 + returns[i] / 100);
+                    const gain = endValue - startValue;
+                    const yearTax = gain * (taxRate / 100);
+                    totalTax += yearTax;
+                    currentValue = endValue - yearTax;
+
+                    yearlyResults.push({
+                        year: i + 1,
+                        gain,
+                        tax: yearTax,
+                        credit: yearTax < 0 ? Math.abs(yearTax) : 0
+                    });
+                }
+
+                return {
+                    totalTax,
+                    afterTaxWealth: currentValue,
+                    effectiveRate: totalTax > 0 ? (totalTax / (calculateAssetPath()[holdingPeriod].value - initialValue)) * 100 : 0,
+                    yearlyResults
+                };
+            };
+
+            const calculateExAnteWealth = () => {
+                const returns = getReturns();
+                let currentValue = initialValue;
+                let totalTax = 0;
+                const yearlyResults = [];
+
+                for (let i = 0; i < holdingPeriod; i++) {
+                    const imputedReturn = currentValue * (riskFreeRate / 100);
+                    const yearTax = imputedReturn * (taxRate / 100);
+                    totalTax += yearTax;
+
+                    const actualReturn = currentValue * (returns[i] / 100);
+                    currentValue = currentValue + actualReturn - yearTax;
+
+                    yearlyResults.push({
+                        year: i + 1,
+                        actualReturn: returns[i],
+                        taxPaid: yearTax,
+                        taxDespiteLoss: returns[i] < 0
+                    });
+                }
+
+                return {
+                    totalTax,
+                    afterTaxWealth: currentValue,
+                    effectiveRate: (totalTax / (calculateAssetPath()[holdingPeriod].value - initialValue)) * 100,
+                    yearlyResults
+                };
+            };
+
+            const calculateRetrospective = () => {
+                const path = calculateAssetPath();
+                const finalValue = path[holdingPeriod].value;
+                const gain = finalValue - initialValue;
+
+                if (gain <= 0) {
+                    return {
+                        totalTax: 0,
+                        afterTaxWealth: finalValue,
+                        effectiveRate: 0
+                    };
+                }
+
+                // Calculate what would have been paid under accrual
+                const accrualResult = calculateAccrual();
+                const compoundingFactor = Math.pow(1 + riskFreeRate / 100, holdingPeriod);
+                const adjustedTax = accrualResult.totalTax * compoundingFactor;
+
+                return {
+                    totalTax: adjustedTax,
+                    afterTaxWealth: finalValue - adjustedTax,
+                    effectiveRate: (adjustedTax / gain) * 100
+                };
+            };
+
+            const regimes = [
+                {
+                    name: "Status Quo",
+                    description: "No capital gains tax on genuine capital assets",
+                    calculate: calculateStatusQuo,
+                    difficulty: 10,
+                    distortions: "Creates bias towards capital gains over income; encourages holding assets for capital appreciation rather than productive use"
+                },
+                {
+                    name: "Realisation-based CGT",
+                    description: "Tax paid only when asset is sold",
+                    calculate: calculateRealisationCGT,
+                    difficulty: 40,
+                    distortions: "Lock-in effect: investors delay selling to defer tax; no adjustment for inflation or time value of money"
+                },
+                {
+                    name: "Accrual / Mark-to-Market",
+                    description: "Annual tax on all gains and losses, whether realised or not",
+                    calculate: calculateAccrual,
+                    difficulty: 80,
+                    distortions: "Liquidity stress when owing tax without selling; valuation challenges for illiquid assets; but no lock-in"
+                },
+                {
+                    name: "Ex-ante Wealth Tax",
+                    description: "Tax the expected risk-free return on asset value",
+                    calculate: calculateExAnteWealth,
+                    difficulty: 60,
+                    distortions: "Tax owed even in loss years; doesn't capture actual returns; simpler valuation than accrual"
+                },
+                {
+                    name: "Retrospective CGT",
+                    description: "Tax at sale but adjust for time value of money",
+                    calculate: calculateRetrospective,
+                    difficulty: 90,
+                    distortions: "Complex calculations; achieves accrual-like outcomes without annual payments; still has some lock-in"
+                }
+            ];
+
+            const currentRegime = regimes[activeTab];
+            const results = currentRegime.calculate();
+
+            // Prepare comparison data
+            const comparisonData = regimes.map(regime => ({
+                name: regime.name,
+                tax: regime.calculate().totalTax
+            }));
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Header */}
+                    <header className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-8 px-4">
+                        <div className="max-w-7xl mx-auto">
+                            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                                Understanding Capital Gains Tax Options for New Zealand
+                            </h1>
+                            <p className="text-lg opacity-90">
+                                Explore five different ways to tax investment gains and see how they affect your wealth
+                            </p>
+                            <p className="text-sm mt-2 opacity-75">
+                                Educational tool only - not tax advice
+                            </p>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="max-w-7xl mx-auto px-4 py-8">
+                        {/* Universal Inputs */}
+                        <div className="bg-white rounded-lg shadow-md p-6 mb-8 fade-in">
+                            <h2 className="text-xl font-semibold mb-4">Set Your Scenario</h2>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Initial Asset Value (NZD)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={initialValue}
+                                        onChange={(e) => setInitialValue(Number(e.target.value))}
+                                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        <Tooltip text="The return on government bonds - used for some tax calculations">
+                                            Risk-free Rate (%)
+                                        </Tooltip>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={riskFreeRate}
+                                        step="0.1"
+                                        onChange={(e) => setRiskFreeRate(Number(e.target.value))}
+                                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Holding Period (years)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={holdingPeriod}
+                                        min="1"
+                                        max="20"
+                                        onChange={(e) => {
+                                            const newPeriod = Number(e.target.value);
+                                            setHoldingPeriod(newPeriod);
+                                            if (growthProfile === 'custom') {
+                                                setCustomReturns(prev => {
+                                                    const newReturns = [...prev];
+                                                    while (newReturns.length < newPeriod) {
+                                                        newReturns.push(7);
+                                                    }
+                                                    return newReturns.slice(0, newPeriod);
+                                                });
+                                            }
+                                        }}
+                                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Growth Profile
+                                    </label>
+                                    <select
+                                        value={growthProfile}
+                                        onChange={(e) => setGrowthProfile(e.target.value)}
+                                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                                    >
+                                        <option value="steady">Steady Growth/Decline</option>
+                                        <option value="tesla">Historical: "Tesla-like"</option>
+                                        <option value="custom">Custom Path</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Growth Profile Specific Inputs */}
+                            <div className="mt-6">
+                                {growthProfile === 'steady' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">
+                                            Annual Growth Rate: {steadyGrowth}%
+                                        </label>
+                                        <input
+                                            type="range"
+                                            min="-20"
+                                            max="30"
+                                            step="0.5"
+                                            value={steadyGrowth}
+                                            onChange={(e) => setSteadyGrowth(Number(e.target.value))}
+                                            className="slider w-full"
+                                        />
+                                    </div>
+                                )}
+
+                                {growthProfile === 'tesla' && (
+                                    <div>
+                                        <p className="text-sm text-gray-600 mb-2">
+                                            Volatile returns inspired by Tesla stock 2013-2023
+                                        </p>
+                                        <ResponsiveContainer width="100%" height={100}>
+                                            <LineChart data={TESLA_RETURNS.slice(0, holdingPeriod).map((r, i) => ({ year: i + 1, return: r }))}>
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="year" />
+                                                <YAxis />
+                                                <Line type="monotone" dataKey="return" stroke="#059669" strokeWidth={2} />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+
+                                {growthProfile === 'custom' && (
+                                    <div>
+                                        <p className="text-sm text-gray-600 mb-2">
+                                            Enter annual returns for each year (%)
+                                        </p>
+                                        <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
+                                            {Array(holdingPeriod).fill(0).map((_, i) => (
+                                                <div key={i}>
+                                                    <label className="text-xs text-gray-500">Year {i + 1}</label>
+                                                    <input
+                                                        type="number"
+                                                        value={customReturns[i] || 0}
+                                                        onChange={(e) => {
+                                                            const newReturns = [...customReturns];
+                                                            newReturns[i] = Number(e.target.value);
+                                                            setCustomReturns(newReturns);
+                                                        }}
+                                                        className="w-full px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-green-500"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Regime Tabs */}
+                        <div className="bg-white rounded-lg shadow-md mb-8">
+                            <div className="flex flex-wrap border-b">
+                                {regimes.map((regime, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setActiveTab(index)}
+                                        className={`px-4 py-3 text-sm font-medium transition-colors ${activeTab === index
+                                                ? 'bg-green-50 text-green-700 border-b-2 border-green-600'
+                                                : 'text-gray-600 hover:text-gray-900'
+                                            }`}
+                                    >
+                                        {regime.name}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Active Regime Content */}
+                            <div className="p-6 fade-in">
+                                <h3 className="text-2xl font-semibold mb-3">{currentRegime.name}</h3>
+                                <p className="text-gray-600 mb-4">{currentRegime.description}</p>
+
+                                {/* Results */}
+                                <div className="grid md:grid-cols-3 gap-4 mb-6">
+                                    <div className="bg-green-50 rounded-lg p-4 card-hover">
+                                        <h4 className="text-sm font-medium text-green-700">Total Tax</h4>
+                                        <p className="text-2xl font-bold text-green-900">
+                                            ${results.totalTax.toLocaleString('en-NZ', { maximumFractionDigits: 0 })}
+                                        </p>
+                                    </div>
+                                    <div className="bg-blue-50 rounded-lg p-4 card-hover">
+                                        <h4 className="text-sm font-medium text-blue-700">After-tax Wealth</h4>
+                                        <p className="text-2xl font-bold text-blue-900">
+                                            ${results.afterTaxWealth.toLocaleString('en-NZ', { maximumFractionDigits: 0 })}
+                                        </p>
+                                    </div>
+                                    <div className="bg-purple-50 rounded-lg p-4 card-hover">
+                                        <h4 className="text-sm font-medium text-purple-700">Effective Tax Rate</h4>
+                                        <p className="text-2xl font-bold text-purple-900">
+                                            {results.effectiveRate.toFixed(1)}%
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Special regime-specific information */}
+                                {activeTab === 2 && results.yearlyResults && (
+                                    <div className="mb-6 p-4 bg-yellow-50 rounded-lg">
+                                        <h4 className="font-medium mb-2">Year-by-Year Tax Credits</h4>
+                                        {results.yearlyResults.filter(r => r.credit > 0).map(r => (
+                                            <p key={r.year} className="text-sm">
+                                                Year {r.year}: Credit of ${r.credit.toFixed(0)} (loss of ${r.gain.toFixed(0)})
+                                            </p>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {activeTab === 3 && results.yearlyResults && (
+                                    <div className="mb-6">
+                                        {results.yearlyResults.filter(r => r.taxDespiteLoss).length > 0 && (
+                                            <div className="p-4 bg-red-50 rounded-lg">
+                                                <h4 className="font-medium text-red-800 mb-2">⚠️ Tax Paid in Loss Years</h4>
+                                                {results.yearlyResults.filter(r => r.taxDespiteLoss).map(r => (
+                                                    <p key={r.year} className="text-sm text-red-700">
+                                                        Year {r.year}: Paid ${r.taxPaid.toFixed(0)} despite {r.actualReturn}% loss
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Distortions and Difficulty */}
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h4 className="font-medium mb-2">Economic Distortions</h4>
+                                        <p className="text-sm text-gray-600">{currentRegime.distortions}</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-medium mb-2">Implementation Difficulty</h4>
+                                        <DifficultyBar level={currentRegime.difficulty} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Comparison Chart */}
+                        <div className="bg-white rounded-lg shadow-md p-6">
+                            <h3 className="text-xl font-semibold mb-4">Compare All Regimes</h3>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={comparisonData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+                                    <YAxis />
+                                    <RechartsTooltip formatter={(value) => `$${value.toLocaleString('en-NZ')}`} />
+                                    <Bar dataKey="tax" fill="#059669" />
+                                </BarChart>
+                            </ResponsiveContainer>
+
+                            {/* Asset Path Visualization */}
+                            <div className="mt-6">
+                                <h4 className="font-medium mb-2">Asset Value Over Time</h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <LineChart data={calculateAssetPath()}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="year" />
+                                        <YAxis />
+                                        <RechartsTooltip formatter={(value) => `$${value.toLocaleString('en-NZ')}`} />
+                                        <Line type="monotone" dataKey="value" stroke="#2563eb" strokeWidth={2} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-gray-800 text-white py-8 px-4 mt-12">
+                        <div className="max-w-7xl mx-auto text-center">
+                            <p className="text-sm">
+                                This is an educational tool only. For actual tax advice, please consult a qualified tax professional.
+                            </p>
+                            <p className="text-xs mt-2 opacity-75">
+                                Based on simplified models of various capital gains tax regimes proposed in academic literature.
+                            </p>
+                        </div>
+                    </footer>
                 </div>
-                <p>Property purchased for $500,000 in 2020, valued at $700,000 on V-Day, sold for $900,000 in 2028.
-                    Results in a taxable gain of $200,000 with tax payable of $78,000 at 39% tax rate.</p>
-            </div>
-            <div class="scenario-card" onclick="loadScenario('loss')">
-                <h3>Capital Loss</h3>
-                <div class="scenario-timeline">
-                    <div class="timeline-line"></div>
-                    <div class="timeline-event" style="left: 0%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">2020</div>
-                        <div class="timeline-event-value">$600k</div>
-                    </div>
-                    <div class="timeline-event" style="left: 50%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">2026</div>
-                        <div class="timeline-event-value">$800k</div>
-                    </div>
-                    <div class="timeline-event" style="left: 100%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">2028</div>
-                        <div class="timeline-event-value">$750k</div>
-                    </div>
-                </div>
-                <p>Property purchased for $600,000 in 2020, valued at $800,000 on V-Day, sold for $750,000 in 2028.
-                    Results in a capital loss of $50,000 which can be offset against other capital gains or potentially
-                    against income.</p>
-            </div>
-            <div class="scenario-card" onclick="loadScenario('neutral')">
-                <h3>No Taxable Gain</h3>
-                <div class="scenario-timeline">
-                    <div class="timeline-line"></div>
-                    <div class="timeline-event" style="left: 0%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">2020</div>
-                        <div class="timeline-event-value">$400k</div>
-                    </div>
-                    <div class="timeline-event" style="left: 50%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">2026</div>
-                        <div class="timeline-event-value">$600k</div>
-                    </div>
-                    <div class="timeline-event" style="left: 100%">
-                        <div class="timeline-event-dot"></div>
-                        <div class="timeline-event-label">2028</div>
-                        <div class="timeline-event-value">$600k</div>
-                    </div>
-                </div>
-                <p>Property purchased for $400,000 in 2020, valued at $600,000 on V-Day, sold for $600,000 in 2028. No
-                    tax payable as there is no post V-Day capital gain.</p>
-            </div>
-        </div>
-    </main>
+            );
+        };
 
-    <script>
-        document.querySelectorAll('.scenario-timeline').forEach(timeline => {
-            updateScenarioTimelinePositions(timeline, 2020, 2026, 2028);
-        });
-
-        function formatCurrency(value) {
-            return '$' + value.toLocaleString();
-        }
-
-        function calculateTimelinePosition(year, startYear, endYear) {
-            return ((year - startYear) / (endYear - startYear) * 100) + '%';
-        }
-
-        function updateScenarioTimelinePositions(scenarioDiv, startYear, midYear, endYear) {
-            const events = scenarioDiv.querySelectorAll('.timeline-event');
-            events[0].style.left = '0%';
-            events[1].style.left = calculateTimelinePosition(midYear, startYear, endYear);
-            events[2].style.left = '100%';
-        }
-
-        function updateCalculations() {
-            const purchasePrice = parseFloat(document.getElementById('purchasePrice').value);
-            const vdayValue = parseFloat(document.getElementById('vdayValue').value);
-            const salePrice = parseFloat(document.getElementById('salePrice').value);
-
-            const selectedRate = document.querySelector('input[name="taxRate"]:checked');
-            let taxRate;
-            if (selectedRate.value === 'custom') {
-                taxRate = parseFloat(document.getElementById('customRateValue').value) / 100;
-            } else {
-                taxRate = parseFloat(selectedRate.value) / 100;
-            }
-
-            const preVDayGain = vdayValue - purchasePrice;
-            const postVDayGain = salePrice - vdayValue;
-            const taxPayable = postVDayGain * taxRate;
-
-            document.getElementById('purchasePriceValue').textContent = formatCurrency(purchasePrice);
-            document.getElementById('vdayValueValue').textContent = formatCurrency(vdayValue);
-            document.getElementById('salePriceValue').textContent = formatCurrency(salePrice);
-
-            document.getElementById('timelinePurchaseValue').textContent = formatCurrency(purchasePrice);
-            document.getElementById('timelineVDayValue').textContent = formatCurrency(vdayValue);
-            document.getElementById('timelineSaleValue').textContent = formatCurrency(salePrice);
-
-            document.getElementById('preVDayGain').textContent = formatCurrency(preVDayGain);
-            document.getElementById('postVDayGain').textContent = formatCurrency(postVDayGain);
-            document.getElementById('effectiveTaxRate').textContent = (taxRate * 100) + '%';
-            document.getElementById('taxPayable').textContent = formatCurrency(taxPayable);
-
-            document.getElementById('postVDayGain').className = postVDayGain >= 0 ? 'gain-positive' : 'gain-negative';
-            document.getElementById('taxPayable').className = postVDayGain >= 0 ? 'tax-positive' : 'tax-negative';
-
-            const purchaseYear = parseInt(document.getElementById('purchaseYear').textContent);
-            const saleYear = parseInt(document.getElementById('saleYear').textContent);
-            const vdayYear = 2026;
-
-            const totalYears = saleYear - purchaseYear;
-            const vdayPosition = ((vdayYear - purchaseYear) / totalYears) * 100;
-
-            document.querySelectorAll('.timeline-event')[1].style.left = vdayPosition + '%';
-        }
-
-        function loadScenario(type) {
-            switch (type) {
-                case 'growth':
-                    document.getElementById('purchasePrice').value = 500000;
-                    document.getElementById('vdayValue').value = 700000;
-                    document.getElementById('salePrice').value = 900000;
-                    document.getElementById('purchaseYear').textContent = '2020';
-                    document.getElementById('saleYear').textContent = '2028';
-                    break;
-                case 'loss':
-                    document.getElementById('purchasePrice').value = 600000;
-                    document.getElementById('vdayValue').value = 800000;
-                    document.getElementById('salePrice').value = 750000;
-                    document.getElementById('purchaseYear').textContent = '2020';
-                    document.getElementById('saleYear').textContent = '2028';
-                    break;
-                case 'neutral':
-                    document.getElementById('purchasePrice').value = 400000;
-                    document.getElementById('vdayValue').value = 600000;
-                    document.getElementById('salePrice').value = 600000;
-                    document.getElementById('purchaseYear').textContent = '2020';
-                    document.getElementById('saleYear').textContent = '2028';
-                    break;
-            }
-            document.querySelectorAll('.scenario-timeline').forEach(timeline => {
-                updateScenarioTimelinePositions(timeline, 2020, 2026, 2028);
-            });
-            updateCalculations();
-
-            const calculator = document.getElementById('calculator');
-            const rect = calculator.getBoundingClientRect();
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const targetScroll = scrollTop + rect.top + (rect.height / 2) - (window.innerHeight / 2);
-            window.scrollTo({
-                top: targetScroll,
-                behavior: 'smooth'
-            });
-        }
-
-        document.getElementById('rateCustom').addEventListener('change', function () {
-            document.getElementById('customRateValue').disabled = !this.checked;
-        });
-
-        document.getElementById('purchasePrice').addEventListener('input', updateCalculations);
-        document.getElementById('vdayValue').addEventListener('input', updateCalculations);
-        document.getElementById('salePrice').addEventListener('input', updateCalculations);
-        document.getElementById('customRateValue').addEventListener('input', updateCalculations);
-        document.querySelectorAll('input[name="taxRate"]').forEach(radio => {
-            radio.addEventListener('change', updateCalculations);
-        });
-
-        updateCalculations();
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
 
