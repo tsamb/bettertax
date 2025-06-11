@@ -142,7 +142,7 @@
     <div id="root"></div>
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
-        const { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = Recharts;
+        const { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } = Recharts;
 
         // Tesla-like historical returns (simplified version of TSLA 2013-2023)
         const TESLA_RETURNS = [50, -10, 30, -20, 45, 15, 35, 80, 25, -65, 40];
@@ -604,7 +604,7 @@
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
                                     <YAxis />
-                                    <RechartsTooltip formatter={(value) => `$${value.toLocaleString('en-NZ')}`} />
+                                    <Tooltip formatter={(value) => `$${value.toLocaleString('en-NZ')}`} />
                                     <Bar dataKey="tax" fill="#059669" />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -617,7 +617,7 @@
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis dataKey="year" />
                                         <YAxis />
-                                        <RechartsTooltip formatter={(value) => `$${value.toLocaleString('en-NZ')}`} />
+                                        <Tooltip formatter={(value) => `$${value.toLocaleString('en-NZ')}`} />
                                         <Line type="monotone" dataKey="value" stroke="#2563eb" strokeWidth={2} />
                                     </LineChart>
                                 </ResponsiveContainer>
